@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+<title>Danfo Rush</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #222;
+  font-family: Arial, sans-serif;
+  touch-action: none;
+}
+
+/* GAME SCREEN */
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #555;
+}
+
+/* ROAD */
+#road {
+  position: absolute;
+  left: 15%;
+  width: 70%;
+  height: 100%;
+  background: #333;
+  border-left: 6px solid white;
+  border-right: 6px solid white;
+}
+
+/* ROAD LINES */
+.lane {
+  position: absolute;
+  width: 8px;
+  height: 80px;
+  background: white;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =========================
+   ORANGE DANFO
+========================= */
+
+#player {
+  position: absolute;
+  width: 76px;
+  height: 125px;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: #f58220;
+  border: 4px solid #111;
+  border-radius: 12px;
+
+  z-index: 10;
+}
+
+/* FRONT WINDSHIELD */
+#player::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 9px;
+  width: 50px;
+  height: 34px;
+  background: #182b35;
+  border: 3px solid white;
+  border-radius: 5px;
+}
+
+/* WHITE DANFO SIDE STRIPE */
+#player::after {
+  content: "";
+  position: absolute;
+  top: 58px;
+  left: -2px;
+  width: 70px;
+  height: 13px;
+  background: white;
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+}
+
+/* WINDOWS */
+.window {
+  position: absolute;
+  top: 78px;
+  width: 19px;
+  height: 23px;
+  background: #182b35;
+  border: 2px solid white;
+  border-radius: 3px;
+}
+
+.window.one {
+  left: 8px;
+}
+
+.window.two {
+  left: 29px;
+}
+
+.window.three {
+  left: 50px;
+}
+
+/* HEADLIGHTS */
+.headlight {
+  position: absolute;
+  bottom: 6px;
+  width: 12px;
+  height: 8px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.headlight.left {
+  left: 8px;
+}
+
+.headlight.right {
+  right: 8px;
+}
+
+/* TYRES */
+.tyre {
+  position: absolute;
+  width: 12px;
+  height: 30px;
+  background: #111;
+  border-radius: 5px;
+}
+
+.tyre.left {
+  left: -10px;
+  top: 25px;
+}
+
+.tyre.right {
+  right: -10px;
+  top: 25px;
+}
+
+/* SCORE */
+#score {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  z-index: 20;
+}
+
+/* CONTROLS */
+#controls {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  z-index: 30;
+}
+
+button {
+  width: 100px;
+  height: 60px;
+  border: none;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.85);
+  font-size: 30px;
+  font-weight: bold;
+}
+
+/* COINS */
+.coin {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: gold;
+  border: 3px solid #b8860b;
+  border-radius: 50%;
+  z-index: 5;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+  <div id="road"></div>
+
+  <div id="score">
+    💰 ₦0
+  </div>
+
+  <!-- DANFO -->
+  <div id="player">
+
+    <div class="window one"></div>
+    <div class="window two"></div>
+    <div class="window three"></div>
+
+    <div class="headlight left"></div>
+    <div class="headlight right"></div>
+
+    <div class="tyre left"></div>
+    <div class="tyre right"></div>
+
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls">
+    <button id="left">⬅️</button>
+    <button id="right">➡️</button>
+  </div>
+
+</div>
+
+<script>
+
+const player = document.getElementById("player");
+const game = document.getElementById("game");
+const scoreDisplay = document.getElementById("score");
+
+let playerX = 50;
+let money = 0;
+let speed = 5;
+
+/* MOVE LEFT */
+function moveLeft() {
+  playerX -= 5;
+
+  if (playerX < 20) {
+    playerX = 20;
+  }
+
+  player.style.left = playerX + "%";
+}
+
+/* MOVE RIGHT */
+function moveRight() {
+  playerX += 5;
+
+  if (playerX > 80) {
+    playerX = 80;
+  }
+
+  player.style.left = playerX + "%";
+}
+
+/* TOUCH CONTROLS */
+document
+  .getElementById("left")
+  .addEventListener("touchstart", moveLeft);
+
+document
+  .getElementById("right")
+  .addEventListener("touchstart", moveRight);
+
+/* CLICK CONTROLS */
+document
+  .getElementById("left")
+  .addEventListener("click", moveLeft);
+
+document
+  .getElementById("right")
+  .addEventListener("click", moveRight);
+
+/* CREATE COINS */
+function createCoin() {
+
+  const coin = document.createElement("div");
+
+  coin.className = "coin";
+
+  coin.style.left =
+    (25 + Math.random() * 50) + "%";
+
+  coin.style.top = "-40px";
+
+  game.appendChild(coin);
+
+  let y = -40;
+
+  const fall = setInterval(() => {
+
+    y += speed;
+
+    coin.style.top = y + "px";
+
+    /* REMOVE COIN */
+    if (y > window.innerHeight) {
+
+      clearInterval(fall);
+      coin.remove();
+
+    }
+
+    /* COLLISION */
+    const p =
+      player.getBoundingClientRect();
+
+    const c =
+      coin.getBoundingClientRect();
+
+    if (
+      p.left < c.right &&
+      p.right > c.left &&
+      p.top < c.bottom &&
+      p.bottom > c.top
+    ) {
+
+      money += 100;
+
+      scoreDisplay.textContent =
+        "💰 ₦" + money;
+
+      clearInterval(fall);
+
+      coin.remove();
+    }
+
+  }, 20);
+}
+
+/* NEW COIN EVERY 1.2 SECONDS */
+setInterval(createCoin, 1200);
+
+</script>
+
+</body>
+</html>
